@@ -8,10 +8,10 @@ const router = new Router();
 const baseURL = "/api";
 
 let computersURL = baseURL + '/computers';
+console.log("sdfsf");
 router
     .get(computersURL, (ctx, next) => {
-        console.log(getAllComputers());
-        ctx.body = '';
+        ctx.body = getAllComputers();
     })
     .get(computersURL + '/:id', (ctx, next) => {
         ctx.body = 'Find computers '+ ctx.params.id;
