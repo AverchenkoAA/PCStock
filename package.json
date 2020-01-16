@@ -3,9 +3,13 @@
   "version": "0.0.1",
   "description": "API for help count computers on stock.",
   "main": "app.js",
-  "dependencies": {},
+  "dependencies": {
+    "koa": "^2.11.0",
+    "supertest": "^4.0.2"
+  },
   "devDependencies": {},
   "scripts": {
+    "start": "node app.js",
     "test": "test.js"
   },
   "repository": {
