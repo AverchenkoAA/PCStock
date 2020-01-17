@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import Koa from 'koa'
 import koaBody from 'koa-body'
 import {getAllComputers} from './middleware/allComputers.js';
-import {Computer} from './domain/computer.js';
+import * as comp from './domain/computer.js';
 import {User} from './domain/user.js';
 import { createReadStream } from 'fs';
 
@@ -13,7 +13,14 @@ const stub = __dirname + '/helpers/stub.html';
 const computersURL = baseURL + '/computers';
 const usersURL = baseURL + '/users';
 
-let pc = new Computer('12345678','APC','Intel', 8, 1000, 240);
+let pc = comp.computer({ 
+    serialNumber :'12345678',
+    model: 'APC',
+    cpu: 'Intel',
+    ram: 8,
+    hdd: 1000,
+    ssd: 240,
+})
 let user = new User('Admin','Adminushka','Prost', "pasword");
 
 //app.use(koaBody())
