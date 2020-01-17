@@ -1,17 +1,26 @@
-const Koa = require('koa');
-const Router = require('koa-router');
-const views = require('koa-views');
-
-import {getAllComputers} from './middleware/computers.js';
+import Router from 'koa-router'
+import Koa from 'koa'
+import koaBody from 'koa-body'
+import {getAllComputers} from './middleware/allComputers.js';
+import {Computer} from './domain/computer.js';
+import {User} from './domain/user.js';
 import { createReadStream } from 'fs';
 
 const app = module.exports = new Koa();
 const router = new Router();
 const baseURL = "/api";
+const stub = __dirname + '/helpers/stub.html';
+const computersURL = baseURL + '/computers';
+const usersURL = baseURL + '/users';
 
-let computersURL = baseURL + '/computers';
+let pc = new Computer('12345678','APC','Intel', 8, 1000, 240);
+let user = new User('Admin','Adminushka','Prost', "pasword");
+
+//app.use(koaBody())
 router
+    //Routes for work with computers
     .get(computersURL, (ctx, next) => {
+        console.log(pc.showComputer());
         ctx.body = getAllComputers();
     })
     .get(computersURL + '/:id', (ctx, next) => {
@@ -26,10 +35,24 @@ router
     .del(computersURL + '/:id', (ctx, next) => {
         ctx.body = 'delete computers '+ ctx.params.id;
     })
-    .all('/', (ctx, next) => {
-        ctx.type = 'html'; ctx.body = createReadStream(__dirname + '/helpers/stub.html');
-        //ctx.body = '../helpers/stub.html';
 
+    //Routes for work with users
+    .get(usersURL,koaBody(), (ctx, next) => {
+        //ctx.body = user.showUser(); 
+        ctx.body = JSON.stringify(user);
+    })
+    .post(usersURL, koaBody(), (ctx, next) => {
+        console.log("///// "+ctx.request.body.login);
+
+        let usr = JSON.parse(JSON.stringify(ctx.request.body));
+        ctx.body = usr.login;
+        console.log(usr.firstName);
+            
+    })
+
+    .all('/', (ctx, next) => {
+        ctx.type = 'html'; 
+        ctx.body = createReadStream(stub);
     });
 
 app.use(router.routes());
