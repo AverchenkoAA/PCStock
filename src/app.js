@@ -1,14 +1,15 @@
 const Koa = require('koa');
 const Router = require('koa-router');
+const views = require('koa-views');
 
 import {getAllComputers} from './middleware/computers.js';
+import { createReadStream } from 'fs';
 
 const app = module.exports = new Koa();
 const router = new Router();
 const baseURL = "/api";
 
 let computersURL = baseURL + '/computers';
-console.log("sdfsf");
 router
     .get(computersURL, (ctx, next) => {
         ctx.body = getAllComputers();
@@ -25,8 +26,10 @@ router
     .del(computersURL + '/:id', (ctx, next) => {
         ctx.body = 'delete computers '+ ctx.params.id;
     })
-    .all(computersURL, (ctx, next) => {
-        ctx.body = 'Unfriendly request';
+    .all('/', (ctx, next) => {
+        ctx.type = 'html'; ctx.body = createReadStream(__dirname + '/helpers/stub.html');
+        //ctx.body = '../helpers/stub.html';
+
     });
 
 app.use(router.routes());
