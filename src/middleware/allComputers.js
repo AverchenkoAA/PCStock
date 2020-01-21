@@ -1,3 +1,8 @@
+import {ComputersWorker} from '../db/dbWorkerComputers.js';
+
+const pcWorker = new ComputersWorker();
+
 export function getAllComputers(){
-    return 'All computers (func)';
+    return pcWorker.findAll();
 }
+
