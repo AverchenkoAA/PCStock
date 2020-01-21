@@ -1,98 +1,66 @@
-const MongoClient = require('mongodb').MongoClient;
-const MONGO_URL = "mongodb://localhost:27017/PCStock";
-const mongoClient = new MongoClient(MONGO_URL, { useUnifiedTopology: true });
+import  mongoose  from 'mongoose';
 
-const dbName = "PCStock";
-const collectionName = "Users";
+const Schema = mongoose.Schema;
 
-export function UsersWorker(){
-    this.add=add;
-    this.findAll=findAll;
-    this.findOneByLogin=findOneByLogin;
-    this.deleteOneByLogin=deleteOneByLogin;
-    this.updateOneByLogin=updateOneByLogin;
-}
+const userScheme = new Schema({
+    login: String,
+    firstName: String,
+    lastName: String,
+    password: String,
+    }, {versionKey: false});
 
-function add(users)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        collection.insertOne(users, function(err, result){ 
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result.ops);
-            client.close();
-        });
+
+const User = mongoose.model("User", userScheme);
+
+function getAllUsers(ctx, next){
+    return User.find({}, function(err, user){
+        if(err) return console.log(err);
+        ctx.body = user;
+        next();
     });
 }
 
-function findAll()
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        collection.find({}).toArray(function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
+function getOneUsers(ctx, next){
+    return User.findOne({_id: ctx.params.id}, function(err, user){
+        if(err) return console.log(err);
+         ctx.body = user;
+         next();
+     });
+}
+
+function insertOneUsers(ctx, next){
+    if(!ctx.request.body) return ctx.status = 400;
+    let usr = JSON.parse(JSON.stringify(ctx.request.body));
+    const user = new User(usr);
+    user.save(function(err){
+             if(err) return console.log(err);
+         });
+    ctx.body = user; 
+    next();  
+}
+
+function deleteOneUsers(ctx, next){
+    return User.findByIdAndDelete(ctx.params.id, function(err, user){
+        if(err) return console.log(err);
+        ctx.body = "Delete success!";
+        next();
     });
 }
 
-function findOneByLogin(userLogin)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { login: userLogin };
-        collection.find(query).toArray(function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
-    });
+function updateOneUsers(ctx, next){
+    if(!ctx.request.body) return ctx.status = 400;
+    let newUser = JSON.parse(JSON.stringify(ctx.request.body));
+    return User.findOneAndUpdate({_id: ctx.params.id}, newUser, {new: true}, function(err, user){
+        if(err) return console.log(err);
+        ctx.body = user;
+        next();
+     });
 }
 
-function deleteOneByLogin(userLogin)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { login: userLogin };
-        collection.deleteOne(query, function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
-    });
-}
-
-function updateOneByLogin(userLogin, newUsers)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { login: userLogin };
-        var newvalues = { $set: newUsers };
-        collection.updateOne(query, newvalues, function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
-    });
+export{
+    updateOneUsers,
+    deleteOneUsers,
+    insertOneUsers,
+    getOneUsers,
+    getAllUsers,
 }

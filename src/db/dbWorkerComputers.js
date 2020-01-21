@@ -1,99 +1,68 @@
-const MongoClient = require('mongodb').MongoClient;
-const MONGO_URL = "mongodb://localhost:27017/PCStock";
-const mongoClient = new MongoClient(MONGO_URL, { useUnifiedTopology: true });
+import  mongoose  from 'mongoose';
 
-const dbName = "PCStock";
-const collectionName = "Computers";
+const Schema = mongoose.Schema;
 
-export function ComputersWorker(){
-    this.add=add;
-    this.findAll=findAll;
-    this.findOneBySerialNumber=findOneBySerialNumber;
-    this.deleteOneBySerialNumber=deleteOneBySerialNumber;
-    this.updateOneBySerialNumber=updateOneBySerialNumber;
-}
+const pcScheme = new Schema({
+    serialNumber: String,
+    model: String,
+    cpu: String,
+    ram: Number,
+    hdd: Number,
+    ssd: Number,
+    }, {versionKey: false});
 
-function add(computer)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        collection.insertOne(computer, function(err, result){ 
-            if(err){ 
-                return console.log(err);
-            }
-            client.close();
-            return result.ops;   
-        });
+
+const Computer = mongoose.model("Computer", pcScheme);
+
+function getAllComputers(ctx, next){
+    return Computer.find({}, function(err, computers){
+        if(err) return console.log(err);
+        ctx.body = computers;
+        next();
     });
 }
 
-function findAll()
-{
-    mongoClient.connect(function(err, client){
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        collection.find({}).toArray(function(err, result) {
-            if(err){ 
-                return console.log("Error: "+err);
-            } 
-            client.close();
-            console.log(JSON.stringify(result));
-              result;
-          });
-    });
-
+function getOneComputers(ctx, next){
+    return Computer.findOne({_id: ctx.params.id}, function(err, computer){
+        if(err) return console.log(err);
+         ctx.body = computer;
+         next();
+     });
 }
 
-function findOneBySerialNumber(serNumber)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { serialNumber: serNumber };
-        collection.find(query).toArray(function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
+function insertOneComputers(ctx, next){
+    if(!ctx.request.body) return ctx.status = 400;
+    let pc = JSON.parse(JSON.stringify(ctx.request.body));
+    const comp = new Computer(pc);
+    comp.save(function(err){
+             if(err) return console.log(err);
+         });
+    ctx.body = comp; 
+    next();  
+}
+
+function deleteOneComputers(ctx, next){
+    return Computer.findByIdAndDelete(ctx.params.id, function(err, computer){
+        if(err) return console.log(err);
+        ctx.body = "Delete success!";
+        next();
     });
 }
 
-function deleteOneBySerialNumber(serNumber)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { serialNumber: serNumber };
-        collection.deleteOne(query, function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
-    });
+function updateOneComputers(ctx, next){
+    if(!ctx.request.body) return ctx.status = 400;
+    let newComputer = JSON.parse(JSON.stringify(ctx.request.body));
+    return Computer.findOneAndUpdate({_id: ctx.params.id}, newComputer, {new: true}, function(err, computer){
+        if(err) return console.log(err);
+        ctx.body = computer;
+        next();
+     });
 }
 
-function updateOneBySerialNumber(serNumber, newComputer)
-{
-    mongoClient.connect(function(err, client){
-        
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-        let query = { serialNumber: serNumber };
-        var newvalues = { $set: newComputer };
-        collection.updateOne(query, newvalues, function(err, result) {
-            if(err){ 
-                return console.log(err);
-            }
-            console.log(result);
-            client.close();
-          });
-    });
+export{
+    updateOneComputers,
+    deleteOneComputers,
+    insertOneComputers,
+    getOneComputers,
+    getAllComputers,
 }
