@@ -1,42 +1,26 @@
 {
-  "name": "pcstock",
-  "version": "0.0.1",
-  "description": "API for help count computers on stock.",
-  "main": "dist/app.js",
+  "name": "PCStock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev-watch": "nodemon --watch 'src/*.ts' --exec ts-node src/server.ts",
+    "dev": "ts-node ./src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "env": ".env",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "dotenv": "^8.2.0",
-    "koa": "^2.11.0",
-    "koa-body": "^4.1.1",
-    "koa-router": "^7.4.0",
-    "koa-views": "^6.2.1",
-    "mongoose": "^5.8.9",
-    "rimraf": "^3.0.0"
+    "@types/node": "^13.5.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.3",
-    "@babel/core": "^7.8.3",
-    "@babel/node": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "babel-jest": "^24.9.0",
-    "eslint-plugin-jest": "^23.6.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.2",
     "nodemon": "^2.0.2"
-  },
-  "scripts": {
-    "dev": "nodemon",
-    "start": "npm run removeBuild && npm run build && npm run start:server",
-    "start:server": "node --inspect ./dist/app.js",
-    "build": "babel ./src --out-dir dist --copy-files",
-    "removeBuild": "rimraf ./dist",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AverchenkoAA/PCStock.git"
-  },
-  "author": "AAA",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AverchenkoAA/PCStock/issues"
-  },
-  "homepage": "https://github.com/AverchenkoAA/PCStock#readme"
+  }
 }
