@@ -8,14 +8,6 @@ class UsersController{
     private db: DB;
     private collectionName = "users";
 
-    private user: User[] = [{
-        login: "admin",
-        password: "admin",
-        firstName:"Admin",
-        lastName:"Adminov",
-        title: "Test User.",
-    }];
-
     constructor(firebase: DB){
         this.db = firebase;
         this.initRoutes();

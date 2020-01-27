@@ -30,6 +30,11 @@ class FireBase{
         return cityRef.get();
     }
 
+    public getOneByEmail(collection: string, email: string){
+        let cityRef = this.db.collection(collection).where('email', '==', email);
+         return cityRef.get();
+     }
+
     public addOne(collection: string, input: any){
         return this.db.collection(collection).add(input);
     }
